@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>TITLE GOES HERE</title>
+    <title>Weather API</title>
 
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
@@ -30,11 +30,11 @@
             <div class="row">
 
                 <form id="gif-form">
-                    <label for="gif-input">GIF for IT!</label>
-                    <input type="text" id="gif-input">
+                    <label for="gif-input">Enter Flight Number!</label>
+                    <input type="text" id="flight-input">
                     <br>
                     <!-- Button triggers new gif to be added -->
-                    <input id="add-gif" type="submit" value="GIF-ETH!!">
+                    <input id="add-gif" data-name= type="submit" value="Submit flight information">
                 </form>
                 <!-- Each column is its own div; each row always gives you 12 columns to work with -->
                 <!-- We have 2 columns here, sized as follows:
@@ -46,7 +46,13 @@
 
             <div class="row">
                 <div class="col-12 col-sm-8 col-md-6">
-                    <p>Content for this column goes here. Inside the div.</p>
+                        <form id="gif-form">
+                                <label for="gif-input">Date Information!</label>
+                                <input type="text" id="gif-input">
+                                <br>
+                                <!-- Button triggers new gif to be added -->
+                                <input id="add-gif" data-name= type="submit" value="Arrival Date">
+                            </form></p>
                 </div>
 
                 <div class="col-12 col-sm-4 col-md-6">
@@ -75,6 +81,92 @@
 
             // Here's an easier way to add a class
             viewport.addClass('fancier');
+
+            var firebaseConfig = {
+  apiKey: "AIzaSyCe5nF0tPdPYk__wVNJTJO2-iWV6547fAg",
+  authDomain: "flightsandfahrenheit.firebaseapp.com",
+  databaseURL: "https://flightsandfahrenheit.firebaseio.com",
+  projectId: "flightsandfahrenheit",
+  storageBucket: "",
+  messagingSenderId: "507367803069",
+  appId: "1:507367803069:web:36fdaf156df85aa3e84fd4"
+};
+//code from Francisco
+// var firebaseConfig = {
+//     apiKey: "AIzaSyDORWg5o64fPN4R0Cnt1DlwC_8dWfEhI4U",
+//     authDomain: "flights-and-fahrenheit.firebaseapp.com",
+//     databaseURL: "https://flights-and-fahrenheit.firebaseio.com",
+//     projectId: "flights-and-fahrenheit",
+//     storageBucket: "flights-and-fahrenheit.appspot.com",
+//     messagingSenderId: "15407877860",
+//     appId: "1:15407877860:web:a9fe39f08a0be2871426f1"
+//   };
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+
+
+// firebaseConfig.initializeApp(firebaseConfig);
+
+var database = firebase.database();
+
+var flightArrivalLon = 0;
+var flightArrivalLat = 0;
+var weather = [];
+$(document).ready(function() {
+
+  $("#add-gif").on("click", function() {
+    event.preventDefault();
+    //console.log(5);
+    var query = $("#flight-input").val().trim();
+
+//console.log(query);
+    var airSettings = {
+      "async": false,
+      "crossDomain": true,
+      "url": "https://aerodatabox.p.rapidapi.com/flights/"+query,
+      "method": "GET",
+      "headers": {
+        "x-rapidapi-host": "aerodatabox.p.rapidapi.com",
+        "x-rapidapi-key": "91517b45bamsh422e95c783d3857p157a15jsne3d2bb772529"
+      }
+    }
+   // console.log(airSettings);
+
+    $.ajax(airSettings).done(function (response) {
+
+     console.log(response);
+     var arrival= response;
+     flightArrivalLat=arrival[0].arrival.airport.location.lat;
+     flightArrivalLon=arrival[0].arrival.airport.location.lon;
+    console.log(flightArrivalLat);
+    console.log(flightArrivalLon);
+
+    });
+    console.log("The folowing is arrival Lattitude")
+    console.log(flightArrivalLat);
+    console.log("The folowing is arrival Longtitude")
+    console.log(flightArrivalLon);
+    var weatherSettings = {
+      "async": true,
+      "crossDomain": true,
+      "url": "https://weather2020-weather-v1.p.rapidapi.com/e8ecee8ff60c478f8a36280fea0524fe/"+flightArrivalLat+"," +flightArrivalLon,
+      "method": "GET",
+      "headers": {
+        "x-rapidapi-host": "weather2020-weather-v1.p.rapidapi.com",
+        "x-rapidapi-key": "91517b45bamsh422e95c783d3857p157a15jsne3d2bb772529"
+      }
+    }
+    //console.log(weatherSettings);
+    $.ajax(weatherSettings).done(function (resp) {
+      console.log(resp);
+      var localweather=resp;
+      console.log("The following is variable localWeather");
+      console.log(localweather);
+    });
+
+  });
+});
 
             // Here are the common jQuery cookie methods
             // Read a cookie
